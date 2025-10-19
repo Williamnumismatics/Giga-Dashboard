@@ -69,3 +69,48 @@ def get_hackatime_stats():
     except requests.exceptions.RequestException as e:
         print(f"Error fetching HackaTime data: {e}")
         return {"time": "Error"}
+
+if __name__ == "__main__":
+    print("booting :)")
+    print("stop with ctrl+c")
+
+    last_hackatime_fetch = 0
+    hackatime_data = {"time": "starting"}
+    hackatime_fetch_interval = 100
+
+    try:
+        while True:
+            cpu_data = get_cpu_stats()
+            ram_data = get_ram_stats()
+            gpu_data = get_gpu_stats()
+            net_data = get_network_stats()
+            vol_data = get_system_volume()
+
+            now = datetime.datetime.now()
+            date_str = now.strftime("%Y-%m-%d")
+            time_str = now.strftime("%H:%M:%S")
+
+            if time.time() - last_hackatime_fetch > hackatime_fetch_interval:
+                hackatime_data = get_hackatime_stats()
+                last_hackatime_fetch = time.time()
+
+            data_string = (
+                f"CPU_U:{cpu_data['usage']:.1f}|"
+                f"CPU_T:{cpu_data['temp']:.1f}|"
+                f"RAM_U:{ram_data['usage']:.1f}|"
+                f"GPU_U:{gpu_data['usage']:.1f}|"
+                f"GPU_T:{gpu_data['temp']:.1f}|"
+                f"NET_D:{net_data['download']:.2f}|"
+                f"NET_U:{net_data['upload']:.2f}|"
+                f"VOL:{vol_data['level']:.0f}|"
+                f"DATE:{date_str}|"
+                f"TIME:{time_str}|"
+                f"HACK:{hackatime_data['time']}"
+            )
+
+            print(data_string)
+
+            time.sleep(1)
+
+    except KeyboardInterrupt:
+        print("\nScript stopped by user.")
