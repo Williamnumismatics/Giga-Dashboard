@@ -25,3 +25,7 @@ def get_cpu_stats():
     elif temps:
         temp = next(iter(temps.values()))[0].current
     return {"usage": usage, "temp": temp}
+
+def get_ram_stats():
+    """Returns RAM usage statistics."""
+    return {"usage": psutil.virtual_memory().percent}
