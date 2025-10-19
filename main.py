@@ -43,3 +43,29 @@ def get_network_stats():
     upload_speed = (bytes_sent * 8) / (1024 * 1024)
     download_speed = (bytes_recv * 8) / (1024 * 1024)
     return {"internet upload speed": upload_speed, "internet download speed": download_speed}
+
+def get_system_volume():
+    """Returns system volume percentage on Windows."""
+    if not is_Windows: return{"level" : 0.0}
+    try:
+        devices = AudioUtilities.GetSpeakers()
+        interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+        volume = cast(interface, POINTER(IAudioEndpointVolume))
+        return {"level": volume.GetMasterVolumeLevelScalar() * 100}     
+    except Exception:
+        return {"level": 0.0}
+
+def get_hackatime_stats():
+    """Fetches HackaTime stats from the API."""
+    if not HACKATIME_API_KEY or HACKATIME_API_KEY == "YOUR_API_KEY_HERE":
+        return {"time": "No API Key"}
+    try:
+        api_endpoint = f"{HACKATIME_API_URL}/users/current/summaries/range=today"
+        response = requests.get(api_endpoint, params={'api_key': HACKATIME_API_KEY})
+        response.raise_for_status()
+        data = response.json()
+        today_summary = data['data'][0]
+        return {"time": today_summary['grand_total']['text']}
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching HackaTime data: {e}")
+        return {"time": "Error"}
