@@ -29,3 +29,7 @@ def get_cpu_stats():
 def get_ram_stats():
     """Returns RAM usage statistics."""
     return {"usage": psutil.virtual_memory().percent}
+
+def get_gpu_stats():
+    return {"usage": 0.0, "temp": 0.0}
+
