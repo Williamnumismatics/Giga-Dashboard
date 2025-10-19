@@ -33,3 +33,13 @@ def get_ram_stats():
 def get_gpu_stats():
     return {"usage": 0.0, "temp": 0.0}
 
+def get_network_stats():
+    """Returns network I/O statistics."""
+    last_io = psutil.net_io_counters()
+    time.sleep(1)
+    new_io = psutil.net_io_counters()
+    bytes_sent_per_sec = new_io.bytes_sent - last_io.bytes_sent
+    bytes_recv_per_sec = new_io.bytes_recv - last_io.bytes_recv
+    upload_speed = (bytes_sent * 8) / (1024 * 1024)
+    download_speed = (bytes_recv * 8) / (1024 * 1024)
+    return {"internet upload speed": upload_speed, "internet download speed": download_speed}
